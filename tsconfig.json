@@ -1,6 +1,28 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
+    "target": "ESNext",
+    "module": "commonjs",
+    "lib": ["es6"],
+    "allowJs": true,
+    "jsx": "react-native",
+    "noEmit": true,
+    "incremental": true,
+    "isolatedModules": true,
+
+    "forceConsistentCasingInFileNames": true,
+
+    "strict": true,
+
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "resolveJsonModule": true,
+    "paths": {
+      "~components": ["./components/"],
+      "~assets/": ["./assets/"],
+      "~images/*": ["./assets/images/*"]
+    },
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
   }
 }
