@@ -1,9 +1,24 @@
 import { StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { Text, View, Button } from "~components";
+import { Text, View, Button, useAuth } from "~components";
+import { useNavigation } from "expo-router";
+import { useEffect } from "react";
 
 const DefaultAuthScreen = () => {
+  const { status } = useAuth();
+  const navigation = useNavigation();
+  useEffect(() => {
+    navigation.addListener("beforeRemove", (e) => {
+      if (status === "logout") {
+        e.preventDefault();
+      }
+    });
+    return () => {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      navigation.removeListener("beforeRemove", () => {});
+    };
+  });
   const blurhash =
     "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
   return (
@@ -24,10 +39,10 @@ const DefaultAuthScreen = () => {
         style={styles.image}
         placeholder={blurhash}
         contentFit="cover"
-        transition={500}
+        // transition={500}
       />
       <Button
-        href="/login"
+        href="auth/login"
         title="Login"
         width="70%"
         height={40}
@@ -36,7 +51,7 @@ const DefaultAuthScreen = () => {
       <View style={styles.signupGroup}>
         <Text>Don{"'"}t have an account?</Text>
         <Button
-          href="/signup"
+          href="auth/signup"
           title="Sign Up"
           type="text"
           fw="400"

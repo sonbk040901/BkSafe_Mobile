@@ -2,7 +2,7 @@ import * as React from "react";
 import { StyleSheet, TouchableOpacity, TextStyle } from "react-native";
 import { useRouter } from "expo-router";
 import { Text } from "./Themed";
-import { colors } from "../constants/Colors";
+import { COLORS } from "../constants/Colors";
 
 interface AdditionalProps {
   title: string;
@@ -31,7 +31,7 @@ const Button = (props: ButtonProps) => {
     ...other
   } = props;
   const router = useRouter();
-  const textColor = type === "solid" ? "white" : colors.primary;
+  const textColor = type === "solid" ? "white" : COLORS.primary;
   const handlePress = href ? () => router.push(href) : onPress;
 
   return (
@@ -62,7 +62,7 @@ export default Button;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.primary,
+    backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 50,
@@ -73,9 +73,9 @@ const styles = StyleSheet.create({
   outlineType: {
     backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: colors.primary,
+    borderColor: COLORS.primary,
   },
   solidType: {
-    backgroundColor: colors.primary,
+    backgroundColor: COLORS.primary,
   },
 });

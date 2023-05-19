@@ -1,7 +1,9 @@
 import * as React from "react";
-import { StyleSheet } from "react-native";
 import { Stack } from "expo-router";
-
+export const unstable_settings = {
+  // Ensure that reloading on `/modal` keeps a back button present.
+  initialRouteName: "index",
+};
 const AuthLayout = () => {
   return (
     <Stack
@@ -10,7 +12,7 @@ const AuthLayout = () => {
       }}
     >
       <Stack.Screen
-        name="auth"
+        name="index"
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -30,6 +32,3 @@ const AuthLayout = () => {
 };
 
 export default AuthLayout;
-const styles = StyleSheet.create({
-  container: {},
-});

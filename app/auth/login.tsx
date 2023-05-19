@@ -1,46 +1,78 @@
-import axios from "axios";
-import * as React from "react";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import {
   Keyboard,
   ScrollView,
   StyleSheet,
   TouchableWithoutFeedback,
-  Alert,
+  // ToastAndroid,
+  // Platform,
 } from "react-native";
-import { Text, Button, View, TextInput as MyTextInput } from "~components";
+import {
+  Text,
+  Button,
+  View,
+  TextInput as MyTextInput,
+  useAuth,
+  Alert,
+} from "~components";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { colors } from "../../constants/Colors";
+import { COLORS } from "../../constants/Colors";
 
-const Signup = () => {
+type D = { success: boolean; message?: string; data?: any };
+const Login = () => {
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [fullname, setFullname] = useState("");
-  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPass, setConfirmPass] = useState("");
+  const [alertProps, setAlertProps] = useState<
+    React.ComponentProps<typeof Alert>
+  >({
+    visible: false,
+    title: "",
+    message: "",
+    type: "info",
+  });
+  const { action } = useAuth();
   const router = useRouter();
-  const handleSignup = async () => {
+  const handleLogin = async () => {
     try {
-      const res = await axios.post("http://192.168.1.61:3000/auth/signup", {
-        email,
-        username,
-        fullname,
-        phone,
-        password,
+      const res = await axios.post<any, AxiosResponse<D, any>>(
+        "http://192.168.1.20:3000/api/auth/login",
+        {
+          email,
+          password,
+        }
+      );
+
+      const data = res.data.data;
+      setAlertProps({
+        visible: true,
+        title: "Success",
+        message: "Login successfully",
+        type: "success",
+        onOk: () => {
+          action.login(data);
+        },
       });
-      Alert.prompt("Success", "Sign up successfully");
-      router.replace("/login");
-    } catch (error: any) {
-      Alert.alert("Error", error.response.data.message);
+    } catch (e: any) {
+      if (e instanceof AxiosError) {
+        const error: AxiosError<D> = e;
+        setAlertProps({
+          visible: true,
+          title: "Error",
+          message: error.response?.data.message || "",
+          type: "error",
+          onOk: () => setAlertProps({ ...alertProps, visible: false }),
+          onCancel: () => setAlertProps({ ...alertProps, visible: false }),
+        });
+      }
     }
   };
+
   return (
     <TouchableWithoutFeedback
       style={{
         flex: 1,
-        width: "100%",
       }}
       onPress={() => Keyboard.dismiss()}
     >
@@ -62,62 +94,41 @@ const Signup = () => {
               keyboardType="email-address"
             />
             <MyTextInput
-              value={username}
-              onChangeText={setUsername}
-              placeholder="Username"
-            />
-            <MyTextInput
-              value={fullname}
-              onChangeText={setFullname}
-              placeholder="Full Name"
-            />
-            <MyTextInput
-              value={phone}
-              onChangeText={setPhone}
-              placeholder="Phone"
-            />
-            <MyTextInput
               value={password}
               onChangeText={setPassword}
               placeholder="Password"
               keyboardType="hidden-password"
             />
-            <MyTextInput
-              value={confirmPass}
-              onChangeText={setConfirmPass}
-              placeholder="Confirm password"
-              keyboardType="hidden-password"
-            />
           </View>
           <View style={{ flex: 1, width: "100%", alignItems: "center" }}>
             <Button
-              title="Sign Up"
+              title="Đăng nhập"
               height={50}
               width="85%"
-              onPress={handleSignup}
+              onPress={handleLogin}
             />
           </View>
 
-          <View style={styles.loginGroup}>
-            <Text>You had a account?</Text>
+          <View style={styles.signupGroup}>
+            <Text>Don{"'"}t have an account?</Text>
             <Button
-              onPress={() => router.replace("/login")}
-              title="Login"
+              onPress={() => router.replace("auth/signup")}
+              title="Sign Up"
               type="text"
               fw="400"
             />
           </View>
         </ScrollView>
+        <Alert {...alertProps} />
       </View>
     </TouchableWithoutFeedback>
   );
 };
 
-export default Signup;
+export default Login;
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
@@ -135,9 +146,9 @@ const styles = StyleSheet.create({
     color: "#000000",
   },
   inputPlaceholder: {
-    color: colors.primary,
+    color: COLORS.primary,
   },
-  loginGroup: {
+  signupGroup: {
     flexDirection: "row",
     backgroundColor: "transparent",
     marginVertical: 15,

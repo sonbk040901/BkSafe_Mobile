@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { View, TextInput as DefaultTextInput } from "./Themed";
 import { useState, useEffect, useRef } from "react";
-import { colors } from "../constants/Colors";
+import { COLORS } from "../constants/Colors";
 
 interface TextInputProps {
   placeholder?: string;
@@ -32,6 +32,7 @@ const TextInput = (props: TextInputProps) => {
       toValue: value || isFocused ? 1 : 0,
       useNativeDriver: true,
     }).start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [animatedIsFocused, isFocused]);
 
   const color = useColorScheme();
@@ -77,14 +78,13 @@ const TextInput = (props: TextInputProps) => {
             styles.textInput,
             {
               borderColor: isFocused
-                ? colors.primary
+                ? COLORS.primary
                 : value
-                ? colors.primary + "80"
+                ? COLORS.primary + "80"
                 : "#aaaaaa",
               borderWidth: isFocused ? 1.5 : 1,
             },
           ]}
-          value={value}
           onChangeText={(text) => {
             setValue(text);
             if (onChangeText) onChangeText(text);
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   inputGroup: {
     position: "relative",
     width: "100%",
-    height: 50,
+    height: 45,
     justifyContent: "center",
   },
   placeholder: {

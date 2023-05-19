@@ -15,14 +15,36 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "plugin": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location.",
+          "alwaysRequireLocationPermission": false
+        }
+      ]
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "REASON_FOR_REQUEST",
+        "UIBackgroundModes": [
+          "location",
+          "fetch"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "ACCESS_BACKGROUND_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
+      "package": "com.bksafe.app",
+      "config.googleMaps.apiKey": "AIzaSyDF3OqOnF6nnV4ceQ_V4cezGo7IrXtDvsU"
     },
     "web": {
       "bundler": "metro",

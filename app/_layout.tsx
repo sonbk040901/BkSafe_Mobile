@@ -1,66 +1,63 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { useFonts } from "expo-font";
-import { SplashScreen, Stack } from "expo-router";
-import { useEffect, useRef } from "react";
-import { useColorScheme, Animated } from "react-native";
+import { SplashScreen, Stack, useRouter } from "expo-router";
+import { useEffect } from "react";
+import { useColorScheme } from "react-native";
+import { AuthProvider, useAuth } from "~components";
+import { useInitApp } from "../hook";
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from "expo-router";
 
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "(tabs)",
-};
+// export const unstable_settings = {
+//   // Ensure that reloading on `/modal` keeps a back button present.
+//   initialRouteName: "(pages)",
+// };
 
-export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-    ...FontAwesome.font,
-  });
+export default function App() {
+  return (
+    <AuthProvider>
+      <Root />
+    </AuthProvider>
+  );
+}
+function Root() {
+  const { loaded, error } = useInitApp();
+  const { status } = useAuth();
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
-
-  return (
-    <>
-      {/* Keep the splash screen open until the assets have loaded. In the future, we should just support async font loading with a native version of font-display. */}
-      {!loaded && <SplashScreen />}
-      {loaded && <RootLayoutNav />}
-    </>
-  );
+  return loaded && status !== "pending" ? <RootLayoutNav /> : <SplashScreen />;
 }
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const anim = useRef<Animated.Value>(new Animated.Value(0)).current;
+  const router = useRouter();
+  const { status } = useAuth();
+
+  useEffect(() => {
+    if (status === "login") {
+      router.replace("home");
+    } else if (status === "logout") {
+      router.replace("auth");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
 
   return (
     <>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack screenOptions={{ animation: "fade" }}>
-          <Stack.Screen
-            name="(tabs)"
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="(auth)"
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="modal"
-            options={{
-              presentation: "modal",
-            }}
-          />
-        </Stack>
+        <Stack
+          key={status}
+          initialRouteName={status === "login" ? "home" : "auth"}
+          screenOptions={{ headerShown: false }}
+        ></Stack>
       </ThemeProvider>
     </>
   );
