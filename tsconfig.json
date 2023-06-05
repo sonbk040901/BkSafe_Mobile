@@ -19,6 +19,7 @@
     "resolveJsonModule": true,
     "paths": {
       "~components": ["./components/"],
+      "~components/*": ["./components/*"],
       "~assets/": ["./assets/"],
       "~images/*": ["./assets/images/*"]
     },

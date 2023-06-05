@@ -1,7 +1,8 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { Text, View, Button, useAuth } from "~components";
+import { useAuth } from "~components/context/Auth";
+import Button from "~components/custom/Button";
 import { useNavigation } from "expo-router";
 import { useEffect } from "react";
 

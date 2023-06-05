@@ -1,13 +1,10 @@
 import * as React from "react";
-import { StyleSheet, TouchableOpacity, TextStyle } from "react-native";
+import { StyleSheet, TouchableOpacity, TextStyle, Text } from "react-native";
 import { useRouter } from "expo-router";
-import { Text } from "./Themed";
-import { COLORS } from "../constants/Colors";
+import { COLORS } from "../../constants/Colors";
 
 interface AdditionalProps {
   title: string;
-  lightColor?: string;
-  darkColor?: string;
   type?: "outline" | "solid" | "text";
   fw?: TextStyle["fontWeight"];
   width?: string | number;
@@ -21,8 +18,6 @@ const Button = (props: ButtonProps) => {
     href,
     onPress,
     title,
-    lightColor,
-    darkColor,
     type = "solid",
     fw = "bold",
     width,
@@ -47,13 +42,7 @@ const Button = (props: ButtonProps) => {
       {...other}
       activeOpacity={0.7}
     >
-      <Text
-        style={{ color: textColor, fontWeight: fw }}
-        lightColor={lightColor}
-        darkColor={darkColor}
-      >
-        {title}
-      </Text>
+      <Text style={{ color: textColor, fontWeight: fw }}>{title}</Text>
     </TouchableOpacity>
   );
 };

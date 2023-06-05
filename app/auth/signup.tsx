@@ -1,21 +1,19 @@
-import axios, { AxiosError } from "axios";
 import * as React from "react";
 import {
   Keyboard,
   ScrollView,
   StyleSheet,
   TouchableWithoutFeedback,
-  Alert,
-  Platform,
-  ToastAndroid,
-  KeyboardAvoidingView,
+  Text,
+  View,
 } from "react-native";
-import { Text, Button, View, TextInput as MyTextInput } from "~components";
+import { Button, TextInput as MyTextInput } from "~components";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { COLORS } from "../../constants/Colors";
-type D = { success: boolean; message?: string; data?: any };
+import { signup as signupAPI } from "../../api";
+import { useAlert } from "~components/custom/Alert";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -24,31 +22,23 @@ const Signup = () => {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
-
+  const Alert = useAlert();
   const router = useRouter();
   const handleSignup = async () => {
     try {
-      const res = await axios.post("http://192.168.1.20:3000/api/auth/signup", {
-        email,
-        username,
-        fullname,
-        phone,
-        password,
+      await signupAPI(email, username, fullname, phone, password);
+      Alert.show({
+        title: "Success",
+        message: "Sign up successfully",
+        type: "success",
       });
-      Alert.prompt("Success", "Sign up successfully", () =>
-        router.replace("auth/login")
-      );
+      router.replace("/login");
     } catch (e: any) {
-      if (e instanceof AxiosError) {
-        const error: AxiosError<D> = e;
-        if (Platform.OS === "android") {
-          ToastAndroid.showWithGravity(
-            error.response?.data.message || "",
-            ToastAndroid.SHORT,
-            ToastAndroid.TOP
-          );
-        } else Alert.alert("Error", error.response?.data.message);
-      }
+      Alert.show({
+        title: "Error",
+        message: e ?? "Network error",
+        type: "error",
+      });
     }
   };
   return (

@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getData, removeData, storeData } from "../../utils";
 import {
   PropsWithChildren,
   useState,
@@ -22,11 +22,11 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
   const [user, setUser] = useState<Record<string, string>>({});
   useEffect(() => {
     const checkLogin = async () => {
-      const token = await AsyncStorage.getItem("token");
-      const user = await AsyncStorage.getItem("user");
+      const token = await getData("token");
+      const user = await getData("user");
       if (token && user) {
         setStatus("login");
-        setUser(JSON.parse(user || "{}"));
+        setUser(user || {});
       } else setStatus("logout");
     };
     checkLogin();
@@ -37,18 +37,14 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
       login: (user: Record<string, string>) => {
         setStatus("login");
         setUser(user);
-        Promise.all([
-          AsyncStorage.setItem("token", user.token),
-          AsyncStorage.setItem("user", JSON.stringify(user)),
-        ]);
+        storeData("token", user.token);
+        storeData("user", user);
       },
       logout: () => {
         setStatus("logout");
         setUser({});
-        Promise.all([
-          AsyncStorage.removeItem("token"),
-          AsyncStorage.removeItem("user"),
-        ]);
+        removeData("token");
+        removeData("user");
       },
     };
   }, []);

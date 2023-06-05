@@ -1,4 +1,10 @@
-import * as React from "react";
+import React, {
+  FC,
+  createContext,
+  useContext,
+  ComponentProps,
+  PropsWithChildren,
+} from "react";
 import {
   Text,
   View,
@@ -6,8 +12,8 @@ import {
   Modal as DefaultModal,
   TouchableOpacity,
 } from "react-native";
-import { COLORS } from "../constants/Colors";
-interface AlertProps extends React.ComponentProps<typeof DefaultModal> {
+import { COLORS } from "../../constants/Colors";
+interface AlertProps extends ComponentProps<typeof DefaultModal> {
   title: string;
   message: string;
   type?: "success" | "error" | "warning" | "info" | "confirm";
@@ -74,8 +80,60 @@ const Alert = (props: AlertProps) => {
     </DefaultModal>
   );
 };
-export default Alert;
+const AlertContext = createContext<{
+  show: (props: {
+    message: string;
+    title: string;
+    type?: AlertProps["type"];
+    onCancel?: () => void;
+    onOk?: () => void;
+  }) => void;
+}>({
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  show: () => {},
+});
+const AlertProvider: FC<PropsWithChildren> = ({ children }) => {
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [title, setTitle] = React.useState("");
+  const [message, setMessage] = React.useState("");
+  const [onOk, setOnOk] = React.useState<(() => void) | undefined>();
+  const [onCancel, setOnCancel] = React.useState<(() => void) | undefined>();
+  const [type, setType] = React.useState<AlertProps["type"]>("info");
 
+  return (
+    <AlertContext.Provider
+      value={{
+        show: ({ message, title, type, onCancel, onOk }) => {
+          setModalVisible(true);
+          setTitle(title);
+          setMessage(message);
+          setOnOk(onOk);
+          setOnCancel(onCancel);
+          setType(type);
+        },
+      }}
+    >
+      {children}
+      <Alert
+        title={title}
+        message={message}
+        visible={modalVisible}
+        type={type}
+        onRequestClose={() => setModalVisible(false)}
+        onOk={() => {
+          setModalVisible(false);
+          onOk?.();
+        }}
+        onCancel={() => {
+          setModalVisible(false);
+          onCancel?.();
+        }}
+      />
+    </AlertContext.Provider>
+  );
+};
+const useAlert = () => useContext(AlertContext);
+export { AlertProvider, useAlert };
 const styles = StyleSheet.create({
   container: {
     flex: 1,

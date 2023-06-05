@@ -4,10 +4,11 @@ import {
   Animated,
   KeyboardTypeOptions,
   useColorScheme,
+  View,
+  TextInput as DefaultTextInput,
 } from "react-native";
-import { View, TextInput as DefaultTextInput } from "./Themed";
 import { useState, useEffect, useRef } from "react";
-import { COLORS } from "../constants/Colors";
+import { COLORS } from "../../constants/Colors";
 
 interface TextInputProps {
   placeholder?: string;

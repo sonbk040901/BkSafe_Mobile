@@ -1,73 +1,41 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
 import {
   Keyboard,
   ScrollView,
   StyleSheet,
   TouchableWithoutFeedback,
+  Text,
+  View,
   // ToastAndroid,
   // Platform,
 } from "react-native";
-import {
-  Text,
-  Button,
-  View,
-  TextInput as MyTextInput,
-  useAuth,
-  Alert,
-} from "~components";
+import { Button, TextInput as MyTextInput } from "~components";
+import { useAuth } from "~components/context/Auth";
+import { useAlert } from "~components/custom/Alert";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { COLORS } from "../../constants/Colors";
+import { login as loginAPI } from "../../api";
 
-type D = { success: boolean; message?: string; data?: any };
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [alertProps, setAlertProps] = useState<
-    React.ComponentProps<typeof Alert>
-  >({
-    visible: false,
-    title: "",
-    message: "",
-    type: "info",
-  });
   const { action } = useAuth();
   const router = useRouter();
-  const handleLogin = async () => {
+  const Alert = useAlert();
+  const handleLogin = useCallback(async (email: string, password: string) => {
     try {
-      const res = await axios.post<any, AxiosResponse<D, any>>(
-        "http://192.168.1.20:3000/api/auth/login",
-        {
-          email,
-          password,
-        }
-      );
-
-      const data = res.data.data;
-      setAlertProps({
-        visible: true,
-        title: "Success",
-        message: "Login successfully",
-        type: "success",
-        onOk: () => {
-          action.login(data);
-        },
+      const data = await loginAPI(email, password);
+      action.login(data);
+    } catch (error: any) {
+      Alert.show({
+        title: "Error",
+        message: error ?? "Network error",
+        type: "error",
       });
-    } catch (e: any) {
-      if (e instanceof AxiosError) {
-        const error: AxiosError<D> = e;
-        setAlertProps({
-          visible: true,
-          title: "Error",
-          message: error.response?.data.message || "",
-          type: "error",
-          onOk: () => setAlertProps({ ...alertProps, visible: false }),
-          onCancel: () => setAlertProps({ ...alertProps, visible: false }),
-        });
-      }
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <TouchableWithoutFeedback
@@ -105,7 +73,7 @@ const Login = () => {
               title="Đăng nhập"
               height={50}
               width="85%"
-              onPress={handleLogin}
+              onPress={() => handleLogin(email, password)}
             />
           </View>
 
@@ -119,7 +87,6 @@ const Login = () => {
             />
           </View>
         </ScrollView>
-        <Alert {...alertProps} />
       </View>
     </TouchableWithoutFeedback>
   );

@@ -1,7 +1,7 @@
-import {} from "react-native";
 import { Tabs } from "expo-router";
 import { ComponentProps } from "react";
 import { FontAwesome } from "@expo/vector-icons";
+import { COLORS } from "../../constants/Colors";
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: "Home",
@@ -23,9 +23,16 @@ export default function PageLayout() {
     <Tabs
       screenOptions={{
         headerStatusBarHeight: 10,
+        headerShown: true,
         headerStyle: {
-          elevation: 0,
-          shadowOpacity: 0,
+          elevation: 10,
+          shadowOffset: {
+            height: 0,
+            width: 0,
+          },
+          shadowColor: "#7a7a7a",
+          shadowRadius: 0,
+          shadowOpacity: 0.5,
         },
       }}
     >
@@ -60,7 +67,13 @@ const screens: ScreenProps[] = [
     name: "home",
     tabBarIconName: "home",
     options: {
-      title: "Home",
+      title: "BKSafe",
+      headerShown: true,
+      headerTitleStyle: {
+        color: COLORS.primary,
+        fontFamily: "Pacifico",
+        fontSize: 30,
+      },
     },
   },
   {
@@ -75,13 +88,6 @@ const screens: ScreenProps[] = [
     tabBarIconName: "bell",
     options: {
       title: "Notification",
-    },
-  },
-  {
-    name: "profile",
-    tabBarIconName: "user",
-    options: {
-      title: "Profile",
     },
   },
   {

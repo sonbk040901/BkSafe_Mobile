@@ -5,9 +5,17 @@ import {
 } from "@react-navigation/native";
 import { SplashScreen, Stack, useRouter } from "expo-router";
 import { useEffect } from "react";
-import { useColorScheme } from "react-native";
-import { AuthProvider, useAuth } from "~components";
+import { FontAwesome } from "@expo/vector-icons";
+import {
+  View,
+  useColorScheme,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { AuthProvider, useAuth } from "~components/context/Auth";
+import { AlertProvider } from "~components/custom/Alert";
 import { useInitApp } from "../hook";
+import { StatusBar } from "expo-status-bar";
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -21,7 +29,9 @@ export {
 export default function App() {
   return (
     <AuthProvider>
-      <Root />
+      <AlertProvider>
+        <Root />
+      </AlertProvider>
     </AuthProvider>
   );
 }
@@ -52,13 +62,54 @@ function RootLayoutNav() {
 
   return (
     <>
+      <StatusBar style="auto" />
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack
           key={status}
           initialRouteName={status === "login" ? "home" : "auth"}
           screenOptions={{ headerShown: false }}
-        ></Stack>
+        >
+          <Stack.Screen
+            name="map"
+            options={{
+              headerShown: false,
+              header: MapHeader,
+            }}
+          />
+        </Stack>
       </ThemeProvider>
     </>
   );
 }
+const MapHeader = () => {
+  return (
+    <>
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={{
+            height: "100%",
+            width: 50,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "red",
+          }}
+        >
+          <FontAwesome
+            size={21}
+            style={{ marginBottom: -3 }}
+            name="arrow-left"
+            color="black"
+          />
+        </TouchableOpacity>
+      </View>
+    </>
+  );
+};
+const styles = StyleSheet.create({
+  container: {
+    width: "100%",
+    height: 70,
+    backgroundColor: "transparent",
+    flexDirection: "row",
+  },
+});
