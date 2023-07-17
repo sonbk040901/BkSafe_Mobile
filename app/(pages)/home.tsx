@@ -1,9 +1,9 @@
 import { View, StyleSheet } from "react-native";
 import { useEffect } from "react";
 import { useNavigation } from "expo-router";
-import { useAuth } from "~components/context/Auth";
 import FunctionBox from "~components/functional/Container";
 import { Images } from "../../constants/Image";
+import { useSelector } from "~redux/index";
 const DATA = [
   [
     { image: Images.car, title: "Car", path: "map?type=car" },
@@ -17,12 +17,12 @@ const DATA = [
   ],
 ];
 function Home() {
-  const { status } = useAuth();
   const navigation = useNavigation();
+  const isLogin = useSelector((state) => state.auth.isLogin);
 
   useEffect(() => {
     navigation.addListener("beforeRemove", (e) => {
-      if (status === "login") {
+      if (isLogin) {
         e.preventDefault();
       }
     });
@@ -41,12 +41,6 @@ function Home() {
         data={DATA[1]}
         title="Other"
       />
-      {/* <Button
-        title="Show map"
-        onPress={() => {
-          router.push(`/map`);
-        }}
-      /> */}
     </View>
   );
 }

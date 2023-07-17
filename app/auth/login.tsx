@@ -5,38 +5,42 @@ import {
   TouchableWithoutFeedback,
   Text,
   View,
-  // ToastAndroid,
-  // Platform,
 } from "react-native";
 import { Button, TextInput as MyTextInput } from "~components";
-import { useAuth } from "~components/context/Auth";
 import { useAlert } from "~components/custom/Alert";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useEffect } from "react";
 import { COLORS } from "../../constants/Colors";
 import { login as loginAPI } from "../../api";
+import { useDispatch, useSelector } from "~redux/index";
+import { login } from "~redux/slice/auth";
+import { clear, setEmail, setPassword } from "~redux/slice/formData";
+import { useMutation } from "@tanstack/react-query";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { action } = useAuth();
+  const { email, password } = useSelector((state) => state.formData);
+  const { mutate, isLoading, data, error } = useMutation(() =>
+    loginAPI(email, password)
+  );
+  const dispatch = useDispatch();
   const router = useRouter();
   const Alert = useAlert();
-  const handleLogin = useCallback(async (email: string, password: string) => {
-    try {
-      const data = await loginAPI(email, password);
-      action.login(data);
-    } catch (error: any) {
+  useEffect(() => {
+    if (isLoading) return;
+    if (error) {
       Alert.show({
         title: "Error",
-        message: error ?? "Network error",
+        message: (error as any) ?? "Network error",
         type: "error",
       });
+      return;
+    }
+    if (data) {
+      dispatch(login(data));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+  }, [isLoading]);
   return (
     <TouchableWithoutFeedback
       style={{
@@ -56,14 +60,12 @@ const Login = () => {
           </View>
           <View style={styles.inputs}>
             <MyTextInput
-              value={email}
-              onChangeText={setEmail}
+              onChangeText={(v) => dispatch(setEmail(v))}
               placeholder="Email"
               keyboardType="email-address"
             />
             <MyTextInput
-              value={password}
-              onChangeText={setPassword}
+              onChangeText={(v) => dispatch(setPassword(v))}
               placeholder="Password"
               keyboardType="hidden-password"
             />
@@ -73,14 +75,20 @@ const Login = () => {
               title="Đăng nhập"
               height={50}
               width="85%"
-              onPress={() => handleLogin(email, password)}
+              onPress={async () => {
+                try {
+                  mutate();
+                } catch (error) {
+                  console.log(error);
+                }
+              }}
             />
           </View>
 
           <View style={styles.signupGroup}>
             <Text>Don{"'"}t have an account?</Text>
             <Button
-              onPress={() => router.replace("auth/signup")}
+              onPress={() => dispatch(clear()) && router.replace("auth/signup")}
               title="Sign Up"
               type="text"
               fw="400"

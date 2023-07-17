@@ -1,7 +1,5 @@
-import { Redirect } from "expo-router";
-
+import { View } from "react-native";
 function Index() {
-  return <Redirect href="home" />;
+  return <View style={{ flex: 1, backgroundColor: "red" }} />;
 }
-
 export default Index;

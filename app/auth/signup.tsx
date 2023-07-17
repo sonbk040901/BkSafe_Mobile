@@ -10,18 +10,24 @@ import {
 import { Button, TextInput as MyTextInput } from "~components";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useState } from "react";
 import { COLORS } from "../../constants/Colors";
 import { signup as signupAPI } from "../../api";
 import { useAlert } from "~components/custom/Alert";
+import { useDispatch, useSelector } from "~redux/index";
+import {
+  clear,
+  setConfirmPass,
+  setEmail,
+  setFullname,
+  setPassword,
+  setPhone,
+  setUsername,
+} from "~redux/slice/formData";
 
 const Signup = () => {
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [fullname, setFullname] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPass, setConfirmPass] = useState("");
+  const { confirmPass, email, fullname, password, phone, username } =
+    useSelector((state) => state.formData);
+  const dispatch = useDispatch();
   const Alert = useAlert();
   const router = useRouter();
   const handleSignup = async () => {
@@ -32,6 +38,7 @@ const Signup = () => {
         message: "Sign up successfully",
         type: "success",
       });
+      dispatch(clear());
       router.replace("/login");
     } catch (e: any) {
       Alert.show({
@@ -62,35 +69,29 @@ const Signup = () => {
             </View>
             <View style={styles.inputs}>
               <MyTextInput
-                value={email}
-                onChangeText={setEmail}
+                onChangeText={(v) => dispatch(setEmail(v))}
                 placeholder="Email"
                 keyboardType="email-address"
               />
               <MyTextInput
-                value={username}
-                onChangeText={setUsername}
+                onChangeText={(v) => dispatch(setUsername(v))}
                 placeholder="Username"
               />
               <MyTextInput
-                value={fullname}
-                onChangeText={setFullname}
+                onChangeText={(v) => dispatch(setFullname(v))}
                 placeholder="Full Name"
               />
               <MyTextInput
-                value={phone}
-                onChangeText={setPhone}
+                onChangeText={(v) => dispatch(setPhone(v))}
                 placeholder="Phone"
               />
               <MyTextInput
-                value={password}
-                onChangeText={setPassword}
+                onChangeText={(v) => dispatch(setPassword(v))}
                 placeholder="Password"
                 keyboardType="hidden-password"
               />
               <MyTextInput
-                value={confirmPass}
-                onChangeText={setConfirmPass}
+                onChangeText={(v) => dispatch(setConfirmPass(v))}
                 placeholder="Confirm password"
                 keyboardType="hidden-password"
               />
@@ -107,7 +108,9 @@ const Signup = () => {
             <View style={styles.loginGroup}>
               <Text>You had a account?</Text>
               <Button
-                onPress={() => router.replace("auth/login")}
+                onPress={() =>
+                  dispatch(clear()) && router.replace("auth/login")
+                }
                 title="Login"
                 type="text"
                 fw="400"

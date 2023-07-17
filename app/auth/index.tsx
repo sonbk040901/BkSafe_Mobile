@@ -1,17 +1,17 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { useAuth } from "~components/context/Auth";
 import Button from "~components/custom/Button";
 import { useNavigation } from "expo-router";
 import { useEffect } from "react";
+import { useSelector } from "~redux/index";
 
 const DefaultAuthScreen = () => {
-  const { status } = useAuth();
+  const isLogin = useSelector((state) => state.auth.isLogin);
   const navigation = useNavigation();
   useEffect(() => {
     navigation.addListener("beforeRemove", (e) => {
-      if (status === "logout") {
+      if (!isLogin) {
         e.preventDefault();
       }
     });

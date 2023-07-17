@@ -88,6 +88,7 @@ const screens: ScreenProps[] = [
     tabBarIconName: "bell",
     options: {
       title: "Notification",
+      headerShown: false,
     },
   },
   {

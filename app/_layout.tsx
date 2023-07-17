@@ -1,115 +1,63 @@
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
-import { SplashScreen, Stack, useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { useEffect } from "react";
-import { FontAwesome } from "@expo/vector-icons";
-import {
-  View,
-  useColorScheme,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
-import { AuthProvider, useAuth } from "~components/context/Auth";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AlertProvider } from "~components/custom/Alert";
 import { useInitApp } from "../hook";
-import { StatusBar } from "expo-status-bar";
+import { Provider } from "react-redux";
+import store from "~redux/store";
+import { useDispatch, useSelector } from "~redux";
+import LoadingModal from "~components/LoadingModal";
+import { getData } from "../utils";
+import { login, logout } from "~redux/slice/auth";
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from "expo-router";
-
-// export const unstable_settings = {
-//   // Ensure that reloading on `/modal` keeps a back button present.
-//   initialRouteName: "(pages)",
-// };
-
+const queryClient = new QueryClient();
 export default function App() {
   return (
-    <AuthProvider>
-      <AlertProvider>
-        <Root />
-      </AlertProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <AlertProvider>
+          <Root />
+        </AlertProvider>
+      </Provider>
+    </QueryClientProvider>
   );
 }
 function Root() {
-  const { loaded, error } = useInitApp();
-  const { status } = useAuth();
+  const [loaded, error] = useInitApp();
+  const dispatch = useDispatch();
+  const { isLoading } = useSelector((state) => state.auth);
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
-  return loaded && status !== "pending" ? <RootLayoutNav /> : <SplashScreen />;
-}
-
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-  const router = useRouter();
-  const { status } = useAuth();
-
   useEffect(() => {
-    if (status === "login") {
-      router.replace("home");
-    } else if (status === "logout") {
-      router.replace("auth");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status]);
+    getData("user").then((v) => {
+      if (!v) dispatch(logout());
+      else dispatch(login(v));
+    });
+  }, [dispatch]);
+  if (!loaded || isLoading) return <LoadingModal />;
+  return <StackScreen />;
+}
 
+function StackScreen() {
+  const { isLogin } = useSelector((state) => state.auth);
+  const router = useRouter();
+  const key = isLogin ? "home" : "auth";
+  useEffect(() => {
+    router.replace(key);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLogin]);
   return (
-    <>
-      <StatusBar style="auto" />
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack
-          key={status}
-          initialRouteName={status === "login" ? "home" : "auth"}
-          screenOptions={{ headerShown: false }}
-        >
-          <Stack.Screen
-            name="map"
-            options={{
-              headerShown: false,
-              header: MapHeader,
-            }}
-          />
-        </Stack>
-      </ThemeProvider>
-    </>
+    /* key: Bắt buộc Layout phải render lại toàn bộ khi key khác nhau */
+    <Stack
+      key={key}
+      screenOptions={{ headerShown: false, animation: "fade_from_bottom" }}
+      initialRouteName={key}
+    />
   );
 }
-const MapHeader = () => {
-  return (
-    <>
-      <View style={styles.container}>
-        <TouchableOpacity
-          style={{
-            height: "100%",
-            width: 50,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "red",
-          }}
-        >
-          <FontAwesome
-            size={21}
-            style={{ marginBottom: -3 }}
-            name="arrow-left"
-            color="black"
-          />
-        </TouchableOpacity>
-      </View>
-    </>
-  );
-};
-const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    height: 70,
-    backgroundColor: "transparent",
-    flexDirection: "row",
-  },
-});

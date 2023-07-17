@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform, ToastAndroid } from "react-native";
 export const storeData = async (key: string, value: any) => {
   try {
     await AsyncStorage.setItem(key, JSON.stringify(value));
@@ -33,7 +34,7 @@ export const getDistance = (
   lat1: number,
   lon1: number,
   lat2: number,
-  lon2: number
+  lon2: number,
 ) => {
   const R = 6371; // km (change this constant to get miles)
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -46,4 +47,11 @@ export const getDistance = (
       (1 - Math.cos(dLon))) /
       2;
   return R * 2 * Math.asin(Math.sqrt(a));
+};
+export const showNativeAlert = (message: string) => {
+  if (Platform.OS === "android") {
+    ToastAndroid.show(message, ToastAndroid.SHORT);
+  } else {
+    alert(message);
+  }
 };

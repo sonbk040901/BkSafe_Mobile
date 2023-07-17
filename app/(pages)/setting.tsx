@@ -1,11 +1,12 @@
 import { View, StyleSheet, FlatList } from "react-native";
 import { SettingElement, UserInfo } from "~components/setting";
-import { useAuth } from "~components/context/Auth";
-import { useRouter } from "expo-router";
+import { useDispatch, useSelector } from "~redux/index";
+import { logout } from "~redux/slice/auth";
 
 function Setting() {
-  const { action, user } = useAuth();
-  const router = useRouter();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
+  if (!user) return null;
   return (
     <View style={styles.container}>
       <UserInfo
@@ -21,11 +22,14 @@ function Setting() {
           {
             title: "About",
             icon: "information",
+          },
+          {
+            title: "Logout",
+            icon: "logout",
             onPress: () => {
-              router.push("/map");
+              dispatch(logout());
             },
           },
-          { title: "Logout", icon: "logout", onPress: action.logout },
         ]}
         renderItem={({ item }) => (
           <SettingElement

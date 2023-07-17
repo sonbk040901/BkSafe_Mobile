@@ -21,7 +21,9 @@
       "~components": ["./components/"],
       "~components/*": ["./components/*"],
       "~assets/": ["./assets/"],
-      "~images/*": ["./assets/images/*"]
+      "~images/*": ["./assets/images/*"],
+      "~redux/*": ["./appRedux/*"],
+      "~redux": ["./appRedux/"],
     },
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true
