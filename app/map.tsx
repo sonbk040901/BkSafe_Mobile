@@ -39,6 +39,7 @@ const MapScreen = () => {
   const [showHeader, setShowHeader] = useState(true);
   const [center, setCenter] = useState(location);
   const [endPos, setEndPos] = useState(location);
+  const [currentLocationValue, setCurrentLocationValue] = useState("");
   const [startValue, setStartValue] = useState("");
   const [endValue, setEndValue] = useState("");
   const headerAnimated = useRef(new Animated.Value(0)).current;
@@ -51,12 +52,16 @@ const MapScreen = () => {
   useEffect(() => {
     if (!location) return;
     const { latitude, longitude } = location;
-    reverseGeocodeAsync({
-      latitude: Math.floor(latitude * 10000) / 10000,
-      longitude: Math.floor(longitude * 10000) / 10000,
-    }).then((v) => {
+    reverseGeocodeAsync(
+      {
+        latitude,
+        longitude,
+      },
+      { useGoogleMaps: true },
+    ).then((v) => {
       if (v.length === 0) return;
-      const { street, subregion, region } = v[0];
+      const { street, subregion, region } = v.filter((v) => v.street)[0];
+      setCurrentLocationValue(`${street}, ${subregion}, ${region}`);
       setStartValue(`${street}, ${subregion}, ${region}`);
     });
   }, [location]);
@@ -96,16 +101,11 @@ const MapScreen = () => {
   const handlePressDriver = (driver: Driver) => {
     setSelectedDriver(driver);
   };
-  const handleCreqteRequest = async () => {
+  const handleCreateRequest = async () => {
     if (!location || !center || !endPos || !selectedDriver) return;
-    const v = await reverseGeocodeAsync({
-      latitude: Math.floor(location.latitude * 10000) / 10000,
-      longitude: Math.floor(location.longitude * 10000) / 10000,
-    });
-    const address = v[0].street + ", " + v[0].subregion + ", " + v[0].region;
     await createRequest({
       currentLocation: {
-        address,
+        address: currentLocationValue,
         latLng: { lat: location.latitude, lng: location.longitude },
       },
       startLocation: {
@@ -278,7 +278,7 @@ const MapScreen = () => {
                 showNativeAlert("Vui lòng chọn tài xế và điểm đến");
                 return;
               }
-              handleCreqteRequest().then(() => {
+              handleCreateRequest().then(() => {
                 Alert.show({
                   title: "Success",
                   message: "Đặt tài xế thành công",

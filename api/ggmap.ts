@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const BASE_URL = "https://maps.googleapis.com/maps/api";
-export const API_KEY = "AIzaSyBVCe0zFOS35lHJiXAodT3SB8tTzHLP32U";
+export const API_KEY = "AIzaSyBqNWBKDUrJyK_JwjzAJ5COgTa4yciMsrE";
 const instance = axios.create({
   baseURL: BASE_URL,
 });

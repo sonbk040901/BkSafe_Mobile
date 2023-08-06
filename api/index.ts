@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { Driver, User } from "../types";
 import { getData } from "../utils";
-export const BASE_URL = "http://192.168.1.17:3000/api/";
+export const BASE_URL = "http://192.168.137.124:3000/api/";
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {

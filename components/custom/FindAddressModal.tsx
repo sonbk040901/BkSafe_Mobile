@@ -169,6 +169,8 @@ const SearchResult = ({
       setLoading(true);
       try {
         const res = await autoComplete(input);
+        console.table(res);
+        
         setResults(res);
       } catch (error) {
         console.log(error);
